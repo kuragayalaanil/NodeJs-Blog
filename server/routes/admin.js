@@ -145,4 +145,53 @@ router.post("/add-post", authMiddleware, async (req, res) => {
     console.log(error);
   }
 });
+
+// Get
+router.get("/edit-post/:id", authMiddleware, async (req, res) => {
+  try {
+    const locals = {
+      title: "Edit Post",
+      description: "Simple Blog created with NodeJs, Express & MongoDB",
+    };
+    const data = await postModel.find({ _id: req.params.id });
+
+    res.render("admin/edit-post", { data, layout: adminLayout, locals });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// PUT Admin
+router.put("/edit-post/:id", authMiddleware, async (req, res) => {
+  try {
+    await postModel.findByIdAndUpdate(req.params.id, {
+      title: req.body.title,
+      body: req.body.body,
+      updatedAt: Date.now(),
+    });
+    res.redirect(`/edit-post/${req.params.id}`);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// Delete
+// Admin -delete Post
+router.delete("/delete-post/:id", async (req, res) => {
+  try {
+    await postModel.deleteOne({ _id: req.params.id });
+    res.redirect("/dashboard");
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+// GET Admin Logout
+router.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  // res.json({
+  //   message: "Logout Sucessful",
+  // });
+  res.redirect("/")
+});
 module.exports = router;
